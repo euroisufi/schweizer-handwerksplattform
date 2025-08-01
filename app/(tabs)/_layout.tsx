@@ -39,7 +39,7 @@ export default function TabLayout() {
           options={{
             title: "Alle Handwerker",
             tabBarIcon: ({ color }) => <Home size={24} color={color} />,
-            headerRight: () => <Users size={20} color={COLORS.white} style={{ marginRight: 16 }} />,
+            headerLeft: () => <Users size={20} color={COLORS.white} style={{ marginLeft: 16 }} />,
           }}
         />
         <Tabs.Screen
@@ -67,7 +67,7 @@ export default function TabLayout() {
           options={{
             title: "Aktuelle Projekte",
             tabBarIcon: ({ color }) => <FolderOpen size={24} color={color} />,
-            headerRight: () => <FolderOpen size={20} color={COLORS.white} style={{ marginRight: 16 }} />,
+            headerLeft: () => <FolderOpen size={20} color={COLORS.white} style={{ marginLeft: 16 }} />,
           }}
         />
         {/* Hide all other tabs for non-logged in users */}
@@ -130,7 +130,7 @@ export default function TabLayout() {
           options={{
             title: "Home",
             tabBarIcon: ({ color }) => <Home size={24} color={color} />,
-            headerRight: () => <Home size={20} color={COLORS.white} style={{ marginRight: 16 }} />,
+            headerLeft: () => <Home size={20} color={COLORS.white} style={{ marginLeft: 16 }} />,
           }}
         />
         <Tabs.Screen
@@ -138,7 +138,7 @@ export default function TabLayout() {
           options={{
             title: "Meine Projekte",
             tabBarIcon: ({ color }) => <Hammer size={24} color={color} />,
-            headerRight: () => <Hammer size={20} color={COLORS.white} style={{ marginRight: 16 }} />,
+            headerLeft: () => <Hammer size={20} color={COLORS.white} style={{ marginLeft: 16 }} />,
           }}
         />
         <Tabs.Screen
@@ -162,7 +162,7 @@ export default function TabLayout() {
           options={{
             title: "Kontoeinstellungen",
             tabBarIcon: ({ color }) => <Settings size={24} color={color} />,
-            headerRight: () => <Settings size={20} color={COLORS.white} style={{ marginRight: 16 }} />,
+            headerLeft: () => <Settings size={20} color={COLORS.white} style={{ marginLeft: 16 }} />,
           }}
         />
         <Tabs.Screen
@@ -170,7 +170,7 @@ export default function TabLayout() {
           options={{
             title: "Profil",
             tabBarIcon: ({ color }) => <User size={24} color={color} />,
-            headerRight: () => <User size={20} color={COLORS.white} style={{ marginRight: 16 }} />,
+            headerLeft: () => <User size={20} color={COLORS.white} style={{ marginLeft: 16 }} />,
           }}
         />
         <Tabs.Screen
@@ -219,7 +219,7 @@ export default function TabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color }) => <Home size={24} color={color} />,
-          headerRight: () => <Home size={20} color={COLORS.white} style={{ marginRight: 16 }} />,
+          headerLeft: () => <Home size={20} color={COLORS.white} style={{ marginLeft: 16 }} />,
         }}
       />
       <Tabs.Screen
@@ -227,7 +227,7 @@ export default function TabLayout() {
         options={{
           title: "Projekte",
           tabBarIcon: ({ color }) => <Hammer size={24} color={color} />,
-          headerRight: () => <Hammer size={20} color={COLORS.white} style={{ marginRight: 16 }} />,
+          headerLeft: () => <Hammer size={20} color={COLORS.white} style={{ marginLeft: 16 }} />,
         }}
       />
       <Tabs.Screen
@@ -244,7 +244,7 @@ export default function TabLayout() {
           ),
           tabBarActiveTintColor: 'transparent',
           tabBarLabelStyle: { display: 'none' },
-          headerRight: () => <CreditCard size={20} color={COLORS.white} style={{ marginRight: 16 }} />,
+          headerLeft: () => <CreditCard size={20} color={COLORS.white} style={{ marginLeft: 16 }} />,
         }}
       />
       <Tabs.Screen
@@ -252,7 +252,7 @@ export default function TabLayout() {
         options={{
           title: "Premium werden",
           tabBarIcon: ({ color }) => <Crown size={24} color={color} />,
-          headerRight: () => <Crown size={20} color={COLORS.white} style={{ marginRight: 16 }} />,
+          headerLeft: () => <Crown size={20} color={COLORS.white} style={{ marginLeft: 16 }} />,
         }}
       />
       <Tabs.Screen
@@ -260,7 +260,7 @@ export default function TabLayout() {
         options={{
           title: "Profil",
           tabBarIcon: ({ color }) => <User size={24} color={color} />,
-          headerRight: () => <User size={20} color={COLORS.white} style={{ marginRight: 16 }} />,
+          headerLeft: () => <User size={20} color={COLORS.white} style={{ marginLeft: 16 }} />,
         }}
       />
       <Tabs.Screen

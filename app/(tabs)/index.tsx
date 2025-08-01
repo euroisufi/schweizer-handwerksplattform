@@ -470,7 +470,7 @@ function BusinessHomeScreen() {
           <View style={styles.premiumBannerContent}>
             <View style={styles.premiumBannerItem}>
               <View style={styles.premiumTitleContainer}>
-                <Crown size={16} color={COLORS.gray[400]} />
+                <Crown size={16} color={COLORS.white} />
                 <Text style={styles.premiumBannerTitle}>Premium nicht aktiviert</Text>
               </View>
               <ScrollView 
@@ -480,32 +480,32 @@ function BusinessHomeScreen() {
               >
                 <View style={styles.premiumBenefits}>
                   <View style={styles.benefitItem}>
-                    <Check size={8} color={COLORS.success} />
+                    <Check size={8} color={'#FFD700'} />
                     <Text style={styles.benefitText}>24h vorab Zugriff</Text>
                   </View>
                   <View style={styles.benefitSeparator} />
                   <View style={styles.benefitItem}>
-                    <Check size={8} color={COLORS.success} />
+                    <Check size={8} color={'#FFD700'} />
                     <Text style={styles.benefitText}>3x mehr Sichtbarkeit</Text>
                   </View>
                   <View style={styles.benefitSeparator} />
                   <View style={styles.benefitItem}>
-                    <Check size={8} color={COLORS.success} />
+                    <Check size={8} color={'#FFD700'} />
                     <Text style={styles.benefitText}>Premium Badge</Text>
                   </View>
                   <View style={styles.benefitSeparator} />
                   <View style={styles.benefitItem}>
-                    <Check size={8} color={COLORS.success} />
+                    <Check size={8} color={'#FFD700'} />
                     <Text style={styles.benefitText}>Prioritäts-Support</Text>
                   </View>
                   <View style={styles.benefitSeparator} />
                   <View style={styles.benefitItem}>
-                    <Check size={8} color={COLORS.success} />
+                    <Check size={8} color={'#FFD700'} />
                     <Text style={styles.benefitText}>Kostenlose Beratung</Text>
                   </View>
                   <View style={styles.benefitSeparator} />
                   <View style={styles.benefitItem}>
-                    <Check size={8} color={COLORS.success} />
+                    <Check size={8} color={'#FFD700'} />
                     <Text style={styles.benefitText}>Erweiterte Statistiken</Text>
                   </View>
                 </View>
@@ -516,7 +516,7 @@ function BusinessHomeScreen() {
             style={styles.premiumUpgradeButton}
             onPress={() => router.push('/premium')}
           >
-            <Crown size={14} color={COLORS.warning} />
+            <Crown size={14} color={'#1a1a1a'} />
             <Text style={styles.premiumUpgradeText}>Jetzt Premium werden</Text>
           </TouchableOpacity>
         </View>
@@ -1191,14 +1191,23 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   premiumBanner: {
-    backgroundColor: COLORS.gray[100],
+    backgroundColor: '#1a1a1a',
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: SPACING.s,
     paddingHorizontal: SPACING.m,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.gray[200],
+    borderBottomColor: '#FFD700',
     marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#FFD700',
+    marginHorizontal: SPACING.m,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   premiumBannerContent: {
     flex: 1,
@@ -1219,7 +1228,7 @@ const styles = StyleSheet.create({
   premiumBannerTitle: {
     ...FONTS.body1,
     fontWeight: '700' as const,
-    color: COLORS.text,
+    color: COLORS.white,
     marginBottom: 4,
     fontSize: 16,
   },
@@ -1237,12 +1246,12 @@ const styles = StyleSheet.create({
   benefitSeparator: {
     width: 1,
     height: 10,
-    backgroundColor: COLORS.gray[300],
+    backgroundColor: 'rgba(255, 215, 0, 0.3)',
     marginHorizontal: SPACING.xs,
   },
   benefitText: {
     ...FONTS.caption,
-    color: COLORS.textLight,
+    color: 'rgba(255, 255, 255, 0.8)',
     fontSize: 8,
   },
   benefitTextActive: {
@@ -1254,17 +1263,22 @@ const styles = StyleSheet.create({
   premiumUpgradeButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.warning + '20',
+    backgroundColor: '#FFD700',
     paddingHorizontal: SPACING.s,
     paddingVertical: 6,
     borderRadius: 12,
     marginLeft: SPACING.s,
     marginTop: -20,
     gap: 4,
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 2,
   },
   premiumUpgradeText: {
     ...FONTS.caption,
-    color: COLORS.warning,
+    color: '#1a1a1a',
     fontWeight: '600' as const,
     fontSize: 11,
   },

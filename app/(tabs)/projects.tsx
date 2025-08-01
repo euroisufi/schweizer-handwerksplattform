@@ -166,14 +166,7 @@ export default function ProjectsScreen() {
         </View>
       )}
       
-      {userType === 'business' && (
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.nearbyButton}>
-            <MapPin size={16} color={COLORS.primary} />
-            <Text style={styles.nearbyButtonText}>In der Nähe</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+
       
       {/* Categories horizontal scroll */}
       <View style={styles.categoriesSection}>
@@ -318,7 +311,7 @@ const styles = StyleSheet.create({
     paddingBottom: 75,
   },
   premiumBanner: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: '#1a1a1a',
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: SPACING.m,
@@ -326,14 +319,17 @@ const styles = StyleSheet.create({
     marginHorizontal: SPACING.m,
     marginTop: SPACING.s,
     borderRadius: 12,
-    shadowColor: COLORS.primary,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
+    borderWidth: 1,
+    borderColor: '#FFD700',
   },
   premiumBannerActive: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#1a1a1a',
+    borderColor: '#FFD700',
   },
   premiumBannerLeft: {
     flexDirection: 'row',
@@ -344,7 +340,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 215, 0, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: SPACING.s,
@@ -380,19 +376,19 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   premiumUpgradeButton: {
-    backgroundColor: COLORS.white,
+    backgroundColor: '#FFD700',
     paddingHorizontal: SPACING.m,
     paddingVertical: SPACING.xs,
     borderRadius: 20,
-    shadowColor: '#000',
+    shadowColor: '#FFD700',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 2,
   },
   premiumUpgradeText: {
     ...FONTS.caption,
-    color: COLORS.primary,
+    color: '#1a1a1a',
     fontWeight: '700' as const,
     fontSize: 12,
   },
