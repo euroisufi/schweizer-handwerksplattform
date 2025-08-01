@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: COLORS.gray[200],
-    marginVertical: 16,
+    marginVertical: 8,
   },
   infoGrid: {
     flexDirection: 'row',
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
   unlockContactSectionOuter: {
     paddingHorizontal: 20,
     paddingBottom: 20,
-    marginTop: 2,
+    marginTop: -8,
   },
   unlockContactSection: {
     backgroundColor: COLORS.gray[50],
