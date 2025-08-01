@@ -115,9 +115,6 @@ function CustomerHomeScreen() {
       <View style={styles.contentSection}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Beliebte Dienstleistungen</Text>
-          <TouchableOpacity onPress={() => router.push('/services')}>
-            <Text style={styles.seeAllText}>Alle anzeigen</Text>
-          </TouchableOpacity>
         </View>
       
       <FlatList
@@ -125,7 +122,7 @@ function CustomerHomeScreen() {
         renderItem={({ item }) => (
           <ServiceItem 
             service={item} 
-            onPress={(service) => router.push(`/services/${service.id}`)}
+            onPress={() => {}}
           />
         )}
         keyExtractor={(item) => item.id}
