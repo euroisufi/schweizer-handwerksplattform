@@ -236,6 +236,16 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     return `${diffDays} Tage`;
   };
 
+  const getProjectBudget = () => {
+    if (project.budget && project.budget.min && project.budget.max) {
+      if (project.budget.min === project.budget.max) {
+        return `${project.budget.min} €`;
+      }
+      return `${project.budget.min} - ${project.budget.max} €`;
+    }
+    return getDaysLeft();
+  };
+
   return (
     <TouchableOpacity activeOpacity={1} onPress={handlePress}>
       <Animated.View style={[animatedStyle]}>
@@ -304,16 +314,15 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                 <Text style={styles.infoLabel}>Projektbudget</Text>
                 <View style={styles.categoryRow}>
                   <Clock size={14} color={COLORS.text} />
-                  <Text style={styles.infoValue}>{getDaysLeft()}</Text>
+                  <Text style={styles.infoValue}>{getProjectBudget()}</Text>
                 </View>
               </View>
             </View>
             
-            {/* Divider after info grid */}
-            <View style={styles.divider} />
-            
             {/* Contact Data */}
             <View style={styles.organizationSection}>
+              {/* Divider before contact data */}
+              <View style={styles.divider} />
               <Text style={styles.organizationLabel}>Kontaktdaten</Text>
               <View style={styles.organizationRow}>
                 <View style={styles.organizationInfo}>
@@ -560,7 +569,7 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   organizationSection: {
-    marginBottom: 20,
+    marginBottom: 8,
   },
   organizationLabel: {
     fontSize: 12,
@@ -612,7 +621,7 @@ const styles = StyleSheet.create({
   unlockContactSectionOuter: {
     paddingHorizontal: 20,
     paddingBottom: 20,
-    marginTop: 7,
+    marginTop: 2,
   },
   unlockContactSection: {
     backgroundColor: COLORS.gray[50],
@@ -671,7 +680,7 @@ const styles = StyleSheet.create({
   unlockedContactSectionOuter: {
     paddingHorizontal: 20,
     paddingBottom: 20,
-    marginTop: 7,
+    marginTop: 2,
   },
   unlockedContactSection: {
     backgroundColor: COLORS.success + '10',
@@ -708,7 +717,7 @@ const styles = StyleSheet.create({
   ownerActionsSectionOuter: {
     paddingHorizontal: 20,
     paddingBottom: 20,
-    marginTop: 7,
+    marginTop: 2,
   },
   ownerActions: {
     padding: 16,
