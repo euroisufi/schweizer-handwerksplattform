@@ -240,6 +240,13 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     <TouchableOpacity activeOpacity={1} onPress={handlePress}>
       <Animated.View style={[animatedStyle]}>
         <View style={styles.card}>
+          {/* Banner */}
+          <View style={styles.banner}>
+            <Text style={styles.bannerText}>
+              {customerDisplayName} sucht einen {category.name}
+            </Text>
+          </View>
+          
           {/* Hero Image */}
           <View style={styles.imageContainer}>
             {project.images && project.images.length > 0 ? (
@@ -316,34 +323,56 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                     <Text style={styles.organizationStatus}>Verifizierter Account</Text>
                   </View>
                 </View>
-                <TouchableOpacity style={styles.visitButton}>
-                  <Text style={styles.visitButtonText}>Besuchen</Text>
-                </TouchableOpacity>
               </View>
             </View>
             
-            {/* Contact Unlock Section for Business View */}
-            {isBusinessView && showContactButton && !isUnlocked && (
+          </View>
+          
+          {/* Contact Unlock Section for Business View - Outside main content */}
+          {isBusinessView && showContactButton && !isUnlocked && (
+            <View style={styles.unlockContactSectionOuter}>
               <TouchableOpacity 
                 style={styles.unlockContactSection}
                 onPress={() => onContactPress && onContactPress(project)}
                 activeOpacity={0.8}
               >
                 <View style={styles.unlockContactContent}>
+                  {/* Profile Image */}
+                  {(profileImageFromUnlocked || customerData?.profileImage || (userType === 'customer' && user && user.id === project.customerId && (user as any)?.logo)) ? (
+                    <Image 
+                      source={{ 
+                        uri: profileImageFromUnlocked || 
+                             (userType === 'customer' && user && user.id === project.customerId && (user as any)?.logo) ||
+                             customerData?.profileImage
+                      }} 
+                      style={styles.unlockContactAvatar} 
+                    />
+                  ) : (
+                    <View style={styles.unlockContactAvatar}>
+                      <Text style={styles.unlockContactInitial}>
+                        {customerDisplayName?.charAt(0) || 'K'}
+                      </Text>
+                    </View>
+                  )}
+                  
                   <View style={styles.unlockContactLeft}>
                     <Text style={styles.unlockContactTitle}>Kontakt freischalten</Text>
                     <Text style={styles.unlockContactSubtitle}>{creditsRequired} Credits erforderlich</Text>
                   </View>
+                  
                   <View style={styles.unlockContactButton}>
                     <Text style={styles.unlockContactButtonText}>Freischalten</Text>
                     <Lock size={16} color={COLORS.white} />
                   </View>
                 </View>
               </TouchableOpacity>
-            )}
+            </View>
+          )}
             
-            {/* Unlocked Contact Info */}
-            {isBusinessView && isUnlocked && (
+          
+          {/* Unlocked Contact Info - Outside main content */}
+          {isBusinessView && isUnlocked && (
+            <View style={styles.unlockedContactSectionOuter}>
               <View style={styles.unlockedContactSection}>
                 <Text style={styles.unlockedContactTitle}>Kontakt freigeschaltet</Text>
                 <View style={styles.unlockedContactInfo}>
@@ -360,10 +389,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   )}
                 </View>
               </View>
-            )}
-            
-            {/* Owner Actions */}
-            {isOwnerView && (
+            </View>
+          )}
+          
+          {/* Owner Actions - Outside main content */}
+          {isOwnerView && (
+            <View style={styles.ownerActionsSectionOuter}>
               <View style={styles.ownerActions}>
                 <Text style={styles.ownerActionsTitle}>Meine Aktionen</Text>
                 <View style={styles.actionButtons}>
@@ -396,8 +427,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   )}
                 </View>
               </View>
-            )}
-          </View>
+            </View>
+          )}
         </View>
       </Animated.View>
     </TouchableOpacity>
@@ -415,6 +446,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.12,
     shadowRadius: 24,
     elevation: 12,
+  },
+  banner: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  bannerText: {
+    fontSize: 14,
+    color: COLORS.white,
+    fontWeight: '600' as const,
+    textAlign: 'center',
   },
   imageContainer: {
     height: 200,
@@ -536,22 +578,16 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontWeight: '500' as const,
   },
-  visitButton: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  visitButtonText: {
-    fontSize: 14,
-    color: COLORS.white,
-    fontWeight: '600' as const,
+
+  unlockContactSectionOuter: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    marginTop: 7,
   },
   unlockContactSection: {
     backgroundColor: COLORS.gray[50],
     borderRadius: 16,
     padding: 16,
-    marginTop: 16,
     borderWidth: 1,
     borderColor: COLORS.gray[200],
   },
@@ -559,6 +595,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  unlockContactAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  unlockContactInitial: {
+    fontSize: 16,
+    color: COLORS.white,
+    fontWeight: '600' as const,
   },
   unlockContactLeft: {
     flex: 1,
@@ -588,11 +638,15 @@ const styles = StyleSheet.create({
     fontWeight: '600' as const,
     marginRight: 8,
   },
+  unlockedContactSectionOuter: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    marginTop: 7,
+  },
   unlockedContactSection: {
     backgroundColor: COLORS.success + '10',
     borderRadius: 16,
     padding: 16,
-    marginTop: 16,
     borderWidth: 1,
     borderColor: COLORS.success + '40',
   },
@@ -621,8 +675,12 @@ const styles = StyleSheet.create({
     fontWeight: '500' as const,
     fontStyle: 'italic',
   },
+  ownerActionsSectionOuter: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    marginTop: 7,
+  },
   ownerActions: {
-    marginTop: 16,
     padding: 16,
     backgroundColor: '#F0F9FF',
     borderRadius: 16,
