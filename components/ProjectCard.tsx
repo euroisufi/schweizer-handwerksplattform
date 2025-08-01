@@ -1,16 +1,8 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, Platform } from 'react-native';
-import { MapPin, Calendar, Clock, CheckCircle, Edit, Lock, User } from 'lucide-react-native';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming, 
-  withSequence,
-  Easing 
-} from 'react-native-reanimated';
+import React from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { MapPin, Clock, CheckCircle, Edit, Lock, User } from 'lucide-react-native';
 import { Project } from '@/types';
 import { COLORS } from '@/constants/colors';
-import { FONTS, SPACING } from '@/constants/layout';
 import { calculateCreditsForProject } from '@/utils/credits';
 import { getCategoryByName } from '@/constants/categories';
 import { CUSTOMERS } from '@/mocks/users';
@@ -38,129 +30,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   onEdit,
   onComplete,
 }) => {
-  // Animation values
-  const scale = useSharedValue(1);
-  const opacity = useSharedValue(1);
-  const translateY = useSharedValue(0);
-  const shadowOpacity = useSharedValue(0.1);
-  const shadowRadius = useSharedValue(8);
-  
-  // Reset animation values when component mounts or project changes
-  useEffect(() => {
-    scale.value = 1;
-    opacity.value = 1;
-    translateY.value = 0;
-    shadowOpacity.value = 0.1;
-    shadowRadius.value = 8;
-  }, [project.id, scale, opacity, translateY, shadowOpacity, shadowRadius]);
-  
-  // Animated styles
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: scale.value },
-      { translateY: translateY.value }
-    ],
-    opacity: opacity.value,
-    shadowOpacity: shadowOpacity.value,
-    shadowRadius: shadowRadius.value,
-    elevation: shadowRadius.value / 2,
-  }));
-  
-  const resetAnimation = () => {
-    const resetEasing = Easing.bezier(0.25, 0.46, 0.45, 0.94);
-    scale.value = withTiming(1, { duration: 150, easing: resetEasing });
-    opacity.value = withTiming(1, { duration: 150, easing: resetEasing });
-    translateY.value = withTiming(0, { duration: 150, easing: resetEasing });
-    shadowOpacity.value = withTiming(0.1, { duration: 150, easing: resetEasing });
-    shadowRadius.value = withTiming(8, { duration: 150, easing: resetEasing });
-  };
-  
   const handlePress = () => {
-    if (Platform.OS === 'web') {
-      // Simple animation for web
-      scale.value = withSequence(
-        withTiming(0.95, { duration: 100, easing: Easing.out(Easing.quad) }),
-        withTiming(1, { duration: 100, easing: Easing.out(Easing.quad) })
-      );
-      setTimeout(() => onPress(project), 150);
-      return;
-    }
-    
-    // Enhanced fluid animation for mobile
-    const pressEasing = Easing.bezier(0.25, 0.46, 0.45, 0.94); // easeOutQuad
-    const exitEasing = Easing.bezier(0.55, 0.06, 0.68, 0.19); // easeInQuad
-    
-    // Press down animation - more fluid
-    scale.value = withTiming(0.96, { 
-      duration: 120, 
-      easing: pressEasing 
-    });
-    
-    opacity.value = withTiming(0.92, { 
-      duration: 120,
-      easing: pressEasing
-    });
-    
-    translateY.value = withTiming(-4, { 
-      duration: 120,
-      easing: pressEasing
-    });
-    
-    shadowOpacity.value = withTiming(0.15, {
-      duration: 120,
-      easing: pressEasing
-    });
-    
-    shadowRadius.value = withTiming(10, {
-      duration: 120,
-      easing: pressEasing
-    });
-    
-    // Zoom out and navigate - smoother transition
-    setTimeout(() => {
-      scale.value = withTiming(0.85, { 
-        duration: 200,
-        easing: exitEasing
-      });
-      
-      opacity.value = withTiming(0.5, { 
-        duration: 200,
-        easing: exitEasing
-      });
-      
-      translateY.value = withTiming(-20, { 
-        duration: 200,
-        easing: exitEasing
-      });
-      
-      shadowOpacity.value = withTiming(0.05, {
-        duration: 200,
-        easing: exitEasing
-      });
-      
-      shadowRadius.value = withTiming(4, {
-        duration: 200,
-        easing: exitEasing
-      });
-      
-      // Navigate after smoother animation
-      setTimeout(() => {
-        onPress(project);
-        // Reset animation after navigation
-        setTimeout(() => {
-          resetAnimation();
-        }, 50);
-      }, 80);
-    }, 120);
+    onPress(project);
   };
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('de-CH', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  };
+
 
   const creditsRequired = calculateCreditsForProject(project.budget);
   const category = getCategoryByName(project.service.category) || {
@@ -247,9 +120,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   };
 
   return (
-    <TouchableOpacity activeOpacity={1} onPress={handlePress}>
-      <Animated.View style={[animatedStyle]}>
-        <View style={styles.card}>
+    <TouchableOpacity activeOpacity={0.8} onPress={handlePress}>
+      <View style={styles.card}>
           {/* Banner */}
           <View style={styles.banner}>
             <View style={styles.bannerContent}>
@@ -437,8 +309,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               </View>
             </View>
           )}
-        </View>
-      </Animated.View>
+      </View>
     </TouchableOpacity>
   );
 };
