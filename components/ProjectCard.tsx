@@ -242,9 +242,14 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         <View style={styles.card}>
           {/* Banner */}
           <View style={styles.banner}>
-            <Text style={styles.bannerText}>
-              {customerDisplayName} sucht einen {category.name}
-            </Text>
+            <View style={styles.bannerContent}>
+              <Text style={styles.bannerText}>
+                <Text style={styles.customerName}>{customerDisplayName}</Text> sucht einen{' '}
+              </Text>
+              <View style={[styles.categoryBadge, { backgroundColor: category.color }]}>
+                <Text style={styles.categoryBadgeText}>{category.name}</Text>
+              </View>
+            </View>
           </View>
           
           {/* Hero Image */}
@@ -446,11 +451,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
+  bannerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+  },
   bannerText: {
     fontSize: 14,
     color: COLORS.white,
     fontWeight: '600' as const,
-    textAlign: 'center',
+  },
+  customerName: {
+    fontWeight: '700' as const,
+  },
+  categoryBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    marginLeft: 4,
+  },
+  categoryBadgeText: {
+    fontSize: 12,
+    color: COLORS.white,
+    fontWeight: '600' as const,
   },
   imageContainer: {
     height: 200,
