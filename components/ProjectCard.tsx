@@ -271,10 +271,17 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               </Text>
             </View>
             
-            {/* Description */}
+            {/* Divider after location */}
+            <View style={styles.divider} />
+            
+            {/* Description Section */}
+            <Text style={styles.sectionTitle}>Projektbeschreibung</Text>
             <Text style={styles.description} numberOfLines={3}>
               {project.description}
             </Text>
+            
+            {/* Divider after description */}
+            <View style={styles.divider} />
             
             {/* Info Grid */}
             <View style={styles.infoGrid}>
@@ -287,9 +294,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                 </View>
               </View>
               
-              {/* Days Left */}
+              {/* Project Budget */}
               <View style={styles.infoItem}>
-                <Text style={styles.infoLabel}>Verbleibend</Text>
+                <Text style={styles.infoLabel}>Projektbudget</Text>
                 <View style={styles.categoryRow}>
                   <Clock size={14} color={COLORS.text} />
                   <Text style={styles.infoValue}>{getDaysLeft()}</Text>
@@ -297,27 +304,14 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               </View>
             </View>
             
-            {/* Organization */}
+            {/* Divider after info grid */}
+            <View style={styles.divider} />
+            
+            {/* Contact Data */}
             <View style={styles.organizationSection}>
-              <Text style={styles.organizationLabel}>Organisation von</Text>
+              <Text style={styles.organizationLabel}>Kontaktdaten</Text>
               <View style={styles.organizationRow}>
                 <View style={styles.organizationInfo}>
-                  {(profileImageFromUnlocked || customerData?.profileImage || (userType === 'customer' && user && user.id === project.customerId && (user as any)?.logo)) ? (
-                    <Image 
-                      source={{ 
-                        uri: profileImageFromUnlocked || 
-                             (userType === 'customer' && user && user.id === project.customerId && (user as any)?.logo) ||
-                             customerData?.profileImage
-                      }} 
-                      style={styles.organizationAvatar} 
-                    />
-                  ) : (
-                    <View style={styles.organizationAvatar}>
-                      <Text style={styles.organizationInitial}>
-                        {customerDisplayName?.charAt(0) || 'K'}
-                      </Text>
-                    </View>
-                  )}
                   <View style={styles.organizationDetails}>
                     <Text style={styles.organizationName}>{customerDisplayName}</Text>
                     <Text style={styles.organizationStatus}>Verifizierter Account</Text>
@@ -497,11 +491,23 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     fontWeight: '500' as const,
   },
+  sectionTitle: {
+    fontSize: 14,
+    color: COLORS.text,
+    fontWeight: '600' as const,
+    marginBottom: 8,
+    marginTop: 16,
+  },
   description: {
     fontSize: 15,
     color: COLORS.textLight,
     lineHeight: 22,
-    marginBottom: 20,
+    marginBottom: 16,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: COLORS.gray[200],
+    marginVertical: 16,
   },
   infoGrid: {
     flexDirection: 'row',
