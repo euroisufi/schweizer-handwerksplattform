@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Search, MapPin, Check, Crown } from 'lucide-react-native';
+import { MapPin, Check, Crown, Star, Zap } from 'lucide-react-native';
 import { COLORS } from '@/constants/colors';
 import { FONTS, SPACING } from '@/constants/layout';
 import { useAuth } from '@/hooks/auth-store';
@@ -12,14 +12,14 @@ import { CATEGORIES } from '@/constants/categories';
 import { BUSINESSES } from '@/mocks/users';
 import ProjectCard from '@/components/ProjectCard';
 import Button from '@/components/Button';
-import Input from '@/components/Input';
+
 
 export default function ProjectsScreen() {
   const router = useRouter();
   const { userType, user } = useAuth();
   const { projects, getUserProjects, completeProject } = useProjects();
   const { hasPremium } = useCredits();
-  const [searchQuery, setSearchQuery] = useState('');
+
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [sortFilter, setSortFilter] = useState<string>('newest');
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
@@ -40,9 +40,6 @@ export default function ProjectsScreen() {
   // Filter and sort projects
   const filteredProjects = userProjects
     .filter(project => {
-      const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           project.description.toLowerCase().includes(searchQuery.toLowerCase());
-      
       const matchesStatus = !statusFilter || project.status === statusFilter;
       const matchesCategory = !categoryFilter || project.service.category === categoryFilter;
       
@@ -57,7 +54,7 @@ export default function ProjectsScreen() {
       
       console.log('Project:', project.title, 'Category:', project.service.category, 'Matches:', matchesBusinessCategories);
       
-      return matchesSearch && matchesStatus && matchesCategory && matchesBusinessCategories;
+      return matchesStatus && matchesCategory && matchesBusinessCategories;
     })
     .sort((a, b) => {
       switch (sortFilter) {
@@ -132,72 +129,51 @@ export default function ProjectsScreen() {
     <View style={styles.container}>
       {/* Premium Banner - show for all business users */}
       {userType === 'business' && (
-        <View style={styles.premiumBanner}>
-          <View style={styles.premiumBannerContent}>
-            <View style={styles.premiumBannerItem}>
-              <View style={styles.premiumTitleContainer}>
-                <Crown size={16} color={hasPremium ? '#FFD700' : COLORS.gray[400]} />
-                <Text style={styles.premiumBannerTitle}>
-                  {hasPremium ? 'Premium aktiviert' : 'Premium nicht aktiviert'}
-                </Text>
-              </View>
-              <ScrollView 
-                horizontal 
-                showsHorizontalScrollIndicator={false}
-                style={styles.benefitsScrollView}
-              >
-                <View style={styles.premiumBenefits}>
-                  <View style={styles.benefitItem}>
-                    <Check size={10} color={COLORS.success} />
-                    <Text style={styles.benefitText}>24h Vorab-Zugriff auf Projekte</Text>
-                  </View>
-                  <View style={styles.benefitSeparator} />
-                  <View style={styles.benefitItem}>
-                    <Check size={10} color={COLORS.success} />
-                    <Text style={styles.benefitText}>3x mehr Sichtbarkeit</Text>
-                  </View>
-                  <View style={styles.benefitSeparator} />
-                  <View style={styles.benefitItem}>
-                    <Check size={10} color={COLORS.success} />
-                    <Text style={styles.benefitText}>Premium Badge</Text>
-                  </View>
-                  <View style={styles.benefitSeparator} />
-                  <View style={styles.benefitItem}>
-                    <Check size={10} color={COLORS.success} />
-                    <Text style={styles.benefitText}>Prioritäts-Support</Text>
-                  </View>
-                </View>
-              </ScrollView>
+        <View style={[styles.premiumBanner, hasPremium && styles.premiumBannerActive]}>
+          <View style={styles.premiumBannerLeft}>
+            <View style={styles.premiumIconContainer}>
+              <Crown size={20} color={hasPremium ? '#FFD700' : COLORS.white} />
+            </View>
+            <View style={styles.premiumTextContainer}>
+              <Text style={styles.premiumBannerTitle}>
+                {hasPremium ? 'Premium Mitglied' : 'Premium werden'}
+              </Text>
+              <Text style={styles.premiumBannerSubtitle}>
+                {hasPremium ? 'Alle Vorteile aktiv' : 'Mehr Aufträge erhalten'}
+              </Text>
             </View>
           </View>
+          
+          <View style={styles.premiumBenefitsContainer}>
+            <View style={styles.premiumBenefitItem}>
+              <Zap size={12} color={hasPremium ? '#FFD700' : COLORS.white} />
+              <Text style={styles.premiumBenefitText}>24h Vorab-Zugriff</Text>
+            </View>
+            <View style={styles.premiumBenefitItem}>
+              <Star size={12} color={hasPremium ? '#FFD700' : COLORS.white} />
+              <Text style={styles.premiumBenefitText}>3x Sichtbarkeit</Text>
+            </View>
+          </View>
+          
           {!hasPremium && (
             <TouchableOpacity 
               style={styles.premiumUpgradeButton}
               onPress={() => router.push('/premium')}
             >
-              <Crown size={14} color={COLORS.warning} />
-              <Text style={styles.premiumUpgradeText}>Jetzt Premium werden</Text>
+              <Text style={styles.premiumUpgradeText}>Upgrade</Text>
             </TouchableOpacity>
           )}
         </View>
       )}
       
-      <View style={styles.header}>
-        <Input
-          placeholder="Projekte suchen..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          leftIcon={<Search size={20} color={COLORS.gray[400]} />}
-          containerStyle={styles.searchContainer}
-        />
-        
-        {userType === 'business' && (
+      {userType === 'business' && (
+        <View style={styles.header}>
           <TouchableOpacity style={styles.nearbyButton}>
             <MapPin size={16} color={COLORS.primary} />
             <Text style={styles.nearbyButtonText}>In der Nähe</Text>
           </TouchableOpacity>
-        )}
-      </View>
+        </View>
+      )}
       
       {/* Categories horizontal scroll */}
       <View style={styles.categoriesSection}>
@@ -342,84 +318,92 @@ const styles = StyleSheet.create({
     paddingBottom: 75,
   },
   premiumBanner: {
-    backgroundColor: COLORS.gray[100],
+    backgroundColor: COLORS.primary,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: SPACING.s,
+    paddingVertical: SPACING.m,
     paddingHorizontal: SPACING.m,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.gray[200],
+    marginHorizontal: SPACING.m,
+    marginTop: SPACING.s,
+    borderRadius: 12,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  premiumBannerContent: {
+  premiumBannerActive: {
+    backgroundColor: '#1a1a2e',
+  },
+  premiumBannerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
   },
-  premiumBannerItem: {
-    alignItems: 'flex-start',
-  },
-  premiumTitleContainer: {
-    flexDirection: 'row',
+  premiumIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     alignItems: 'center',
-    gap: 6,
-    marginBottom: 4,
+    justifyContent: 'center',
+    marginRight: SPACING.s,
   },
-  benefitsScrollView: {
-    marginRight: -SPACING.m,
+  premiumTextContainer: {
+    flex: 1,
   },
   premiumBannerTitle: {
-    ...FONTS.body2,
+    ...FONTS.body1,
     fontWeight: '700' as const,
-    color: COLORS.text,
-    marginBottom: 4,
+    color: COLORS.white,
+    marginBottom: 2,
   },
-  premiumBenefits: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  benefitItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
-  },
-  benefitSeparator: {
-    width: 1,
-    height: 12,
-    backgroundColor: COLORS.gray[300],
-  },
-  benefitText: {
+  premiumBannerSubtitle: {
     ...FONTS.caption,
-    color: COLORS.textLight,
-    fontSize: 9,
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 12,
+  },
+  premiumBenefitsContainer: {
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    marginRight: SPACING.s,
+  },
+  premiumBenefitItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 2,
+  },
+  premiumBenefitText: {
+    ...FONTS.caption,
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontSize: 10,
+    marginLeft: 4,
   },
   premiumUpgradeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.warning + '20',
-    paddingHorizontal: SPACING.s,
-    paddingVertical: 6,
-    borderRadius: 12,
-    marginLeft: SPACING.s,
-    marginTop: -8,
-    gap: 4,
+    backgroundColor: COLORS.white,
+    paddingHorizontal: SPACING.m,
+    paddingVertical: SPACING.xs,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   premiumUpgradeText: {
     ...FONTS.caption,
-    color: COLORS.warning,
-    fontWeight: '600' as const,
-    fontSize: 11,
+    color: COLORS.primary,
+    fontWeight: '700' as const,
+    fontSize: 12,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-end',
     padding: SPACING.m,
     backgroundColor: COLORS.white,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.gray[200],
-  },
-  searchContainer: {
-    flex: 1,
-    marginBottom: 0,
-    height: 25,
   },
   nearbyButton: {
     flexDirection: 'row',
