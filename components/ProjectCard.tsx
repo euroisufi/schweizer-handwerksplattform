@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, Platform } from 'react-native';
-import { MapPin, Calendar, Ruler, CheckCircle, Edit, Lock } from 'lucide-react-native';
+import { MapPin, Calendar, Clock, CheckCircle, Edit, Lock, User } from 'lucide-react-native';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -16,7 +16,6 @@ import { getCategoryByName } from '@/constants/categories';
 import { CUSTOMERS } from '@/mocks/users';
 import { useAuth } from '@/hooks/auth-store';
 import { useCredits } from '@/hooks/credits-store';
-import Card from './Card';
 
 interface ProjectCardProps {
   project: Project;
@@ -225,203 +224,181 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     console.log('ProjectCard: Using default name "Der Kunde" for project:', project.id);
   }
 
+  const getDaysLeft = () => {
+    const today = new Date();
+    const startDate = new Date(project.timeframe.start);
+    const diffTime = startDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) return 'Überfällig';
+    if (diffDays === 0) return 'Heute';
+    if (diffDays === 1) return '1 Tag';
+    return `${diffDays} Tage`;
+  };
+
   return (
     <TouchableOpacity activeOpacity={1} onPress={handlePress}>
       <Animated.View style={[animatedStyle]}>
-        <Card style={styles.card} padding="none">
-        <View style={styles.imageContainer}>
-          {project.images && project.images.length > 0 ? (
-            <Image source={{ uri: project.images[0] }} style={styles.image} />
-          ) : (
-            <View style={[styles.image, styles.noImage]}>
-              <Text style={styles.noImageText}>{project.service.icon}</Text>
-            </View>
-          )}
-          <View style={styles.imageOverlay} />
+        <View style={styles.card}>
+          {/* Hero Image */}
+          <View style={styles.imageContainer}>
+            {project.images && project.images.length > 0 ? (
+              <Image source={{ uri: project.images[0] }} style={styles.image} />
+            ) : (
+              <View style={[styles.image, styles.noImage]}>
+                <Text style={styles.noImageText}>{project.service.icon}</Text>
+              </View>
+            )}
+          </View>
           
-          {/* Category tag */}
-          {category && (
-            <View style={[styles.categoryTag, { backgroundColor: category.color }]}>
-              <Text style={styles.categoryTagText}>
-                <Text style={styles.categoryPrefixText}>{customerDisplayName} sucht einen </Text>
-                <Text style={styles.categoryNameText}>{category.name}</Text>
+          {/* Content */}
+          <View style={styles.content}>
+            {/* Title */}
+            <Text style={styles.title}>{project.title}</Text>
+            
+            {/* Location */}
+            <View style={styles.locationRow}>
+              <MapPin size={16} color={COLORS.textLight} />
+              <Text style={styles.locationText}>
+                {project.location.city}, {project.location.canton}
               </Text>
             </View>
-          )}
-        </View>
-        
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <Text style={styles.title}>{project.title}</Text>
-            <View style={styles.badges}>
-              {project.status === 'completed' && (
-                <View style={[styles.badge, styles.completedBadge]}>
-                  <CheckCircle size={12} color={COLORS.white} />
-                  <Text style={styles.badgeText}>Abgeschlossen</Text>
+            
+            {/* Description */}
+            <Text style={styles.description} numberOfLines={3}>
+              {project.description}
+            </Text>
+            
+            {/* Info Grid */}
+            <View style={styles.infoGrid}>
+              {/* Category */}
+              <View style={styles.infoItem}>
+                <Text style={styles.infoLabel}>Kategorie</Text>
+                <View style={styles.categoryRow}>
+                  <User size={14} color={COLORS.text} />
+                  <Text style={styles.infoValue}>{category.name}</Text>
                 </View>
-              )}
-              {isBusinessView && project.status !== 'completed' && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>Neu</Text>
-                </View>
-              )}
-            </View>
-          </View>
-          
-          <Text style={styles.description} numberOfLines={2}>
-            {project.description}
-          </Text>
-          
-          <View style={styles.details}>
-            <View style={styles.detailRow}>
-              <View style={styles.detailItemHorizontal}>
-                <MapPin size={14} color={COLORS.textLight} />
-                <Text style={styles.detailTextSmall}>
-                  {project.location.city}, {project.location.canton}
-                </Text>
               </View>
               
-              <Text style={styles.detailSeparator}>|</Text>
-              
-              <View style={styles.detailItemHorizontal}>
-                <Calendar size={14} color={COLORS.textLight} />
-                <Text style={styles.detailTextSmall}>
-                  {formatDate(project.timeframe.start)}
-                </Text>
+              {/* Days Left */}
+              <View style={styles.infoItem}>
+                <Text style={styles.infoLabel}>Verbleibend</Text>
+                <View style={styles.categoryRow}>
+                  <Clock size={14} color={COLORS.text} />
+                  <Text style={styles.infoValue}>{getDaysLeft()}</Text>
+                </View>
               </View>
-              
-              {project.area && (
-                <>
-                  <Text style={styles.detailSeparator}>|</Text>
-                  <View style={styles.detailItemHorizontal}>
-                    <Ruler size={14} color={COLORS.textLight} />
-                    <Text style={styles.detailTextSmall}>{project.area} m²</Text>
-                  </View>
-                </>
-              )}
             </View>
-            <View style={styles.detailsPadding} />
-          </View>
-          
-          {isBusinessView && (
-            <>
-              {showContactButton && !isUnlocked && (
-                <TouchableOpacity 
-                  style={styles.unlockContactCard}
-                  onPress={() => onContactPress && onContactPress(project)}
-                  activeOpacity={0.8}
-                >
-                  <View style={styles.customerPreview}>
-                    {(profileImageFromUnlocked || customerData?.profileImage || (userType === 'customer' && user && user.id === project.customerId && (user as any)?.logo)) ? (
-                      <Image 
-                        source={{ 
-                          uri: profileImageFromUnlocked || 
-                               (userType === 'customer' && user && user.id === project.customerId && (user as any)?.logo) ||
-                               customerData?.profileImage
-                        }} 
-                        style={styles.customerImageBlurred} 
-                      />
-                    ) : (
-                      <View style={styles.customerImageBlurred}>
-                        <Text style={styles.customerInitial}>
-                          {customerDisplayName?.charAt(0) || 'K'}
-                        </Text>
-                      </View>
-                    )}
-                    <Text style={styles.customerNameBlurred}>
-                      {customerDisplayName}
-                    </Text>
+            
+            {/* Organization */}
+            <View style={styles.organizationSection}>
+              <Text style={styles.organizationLabel}>Organisation von</Text>
+              <View style={styles.organizationRow}>
+                <View style={styles.organizationInfo}>
+                  {(profileImageFromUnlocked || customerData?.profileImage || (userType === 'customer' && user && user.id === project.customerId && (user as any)?.logo)) ? (
+                    <Image 
+                      source={{ 
+                        uri: profileImageFromUnlocked || 
+                             (userType === 'customer' && user && user.id === project.customerId && (user as any)?.logo) ||
+                             customerData?.profileImage
+                      }} 
+                      style={styles.organizationAvatar} 
+                    />
+                  ) : (
+                    <View style={styles.organizationAvatar}>
+                      <Text style={styles.organizationInitial}>
+                        {customerDisplayName?.charAt(0) || 'K'}
+                      </Text>
+                    </View>
+                  )}
+                  <View style={styles.organizationDetails}>
+                    <Text style={styles.organizationName}>{customerDisplayName}</Text>
+                    <Text style={styles.organizationStatus}>Verifizierter Account</Text>
                   </View>
-                  
-                  <View style={styles.creditsCost}>
-                    <Text style={styles.creditsText}>{creditsRequired} Credits</Text>
-                  </View>
-                  
-                  <View style={styles.unlockAction}>
-                    <Text style={styles.unlockText}>Freischalten</Text>
-                    <Lock size={16} color={COLORS.white} style={styles.lockIcon} />
-                  </View>
+                </View>
+                <TouchableOpacity style={styles.visitButton}>
+                  <Text style={styles.visitButtonText}>Besuchen</Text>
                 </TouchableOpacity>
-              )}
-              
-              {isUnlocked && (
-                <View style={styles.unlockedContactCard}>
-                  <View style={styles.customerPreview}>
-                    {(profileImageFromUnlocked || customerData?.profileImage || (userType === 'customer' && user && user.id === project.customerId && (user as any)?.logo)) ? (
-                      <Image 
-                        source={{ 
-                          uri: profileImageFromUnlocked || 
-                               (userType === 'customer' && user && user.id === project.customerId && (user as any)?.logo) ||
-                               customerData?.profileImage
-                        }} 
-                        style={styles.customerImage} 
-                      />
-                    ) : (
-                      <View style={styles.customerImage}>
-                        <Text style={styles.customerInitial}>
-                          {customerDisplayName?.charAt(0) || 'K'}
-                        </Text>
-                      </View>
-                    )}
-                    <Text style={styles.customerName}>
-                      {customerDisplayName}
-                    </Text>
-                  </View>
-                  
-                  <View style={styles.contactInfo}>
-                    {project.contactPhone || customerData?.phone ? (
-                      <Text style={styles.phoneNumber}>
-                        {project.contactPhone || customerData?.phone}
-                      </Text>
-                    ) : project.contactEmail || customerData?.email ? (
-                      <Text style={styles.emailAddress}>
-                        {project.contactEmail || customerData?.email}
-                      </Text>
-                    ) : (
-                      <Text style={styles.noContactInfo}>Keine Kontaktdaten</Text>
-                    )}
-                  </View>
-                </View>
-              )}
-            </>
-          )}
-          
-          {isOwnerView && (
-            <View style={styles.ownerActions}>
-              <Text style={styles.ownerActionsTitle}>Meine Aktionen</Text>
-              <View style={styles.actionButtons}>
-                {project.status !== 'completed' && onEdit && (
-                  <TouchableOpacity
-                    style={styles.actionButton}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      onEdit(project);
-                    }}
-                  >
-                    <Edit size={16} color={COLORS.primary} />
-                    <Text style={styles.actionButtonText}>Bearbeiten</Text>
-                  </TouchableOpacity>
-                )}
-                
-                {project.status !== 'completed' && onComplete && (
-                  <TouchableOpacity
-                    style={[styles.actionButton, styles.completeActionButton]}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      onComplete(project);
-                    }}
-                  >
-                    <CheckCircle size={16} color={COLORS.white} />
-                    <Text style={[styles.actionButtonText, styles.completeActionButtonText]}>
-                      Abschließen
-                    </Text>
-                  </TouchableOpacity>
-                )}
               </View>
             </View>
-          )}
+            
+            {/* Contact Unlock Section for Business View */}
+            {isBusinessView && showContactButton && !isUnlocked && (
+              <TouchableOpacity 
+                style={styles.unlockContactSection}
+                onPress={() => onContactPress && onContactPress(project)}
+                activeOpacity={0.8}
+              >
+                <View style={styles.unlockContactContent}>
+                  <View style={styles.unlockContactLeft}>
+                    <Text style={styles.unlockContactTitle}>Kontakt freischalten</Text>
+                    <Text style={styles.unlockContactSubtitle}>{creditsRequired} Credits erforderlich</Text>
+                  </View>
+                  <View style={styles.unlockContactButton}>
+                    <Text style={styles.unlockContactButtonText}>Freischalten</Text>
+                    <Lock size={16} color={COLORS.white} />
+                  </View>
+                </View>
+              </TouchableOpacity>
+            )}
+            
+            {/* Unlocked Contact Info */}
+            {isBusinessView && isUnlocked && (
+              <View style={styles.unlockedContactSection}>
+                <Text style={styles.unlockedContactTitle}>Kontakt freigeschaltet</Text>
+                <View style={styles.unlockedContactInfo}>
+                  {project.contactPhone || customerData?.phone ? (
+                    <Text style={styles.phoneNumber}>
+                      {project.contactPhone || customerData?.phone}
+                    </Text>
+                  ) : project.contactEmail || customerData?.email ? (
+                    <Text style={styles.emailAddress}>
+                      {project.contactEmail || customerData?.email}
+                    </Text>
+                  ) : (
+                    <Text style={styles.noContactInfo}>Keine Kontaktdaten</Text>
+                  )}
+                </View>
+              </View>
+            )}
+            
+            {/* Owner Actions */}
+            {isOwnerView && (
+              <View style={styles.ownerActions}>
+                <Text style={styles.ownerActionsTitle}>Meine Aktionen</Text>
+                <View style={styles.actionButtons}>
+                  {project.status !== 'completed' && onEdit && (
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        onEdit(project);
+                      }}
+                    >
+                      <Edit size={16} color={COLORS.primary} />
+                      <Text style={styles.actionButtonText}>Bearbeiten</Text>
+                    </TouchableOpacity>
+                  )}
+                  
+                  {project.status !== 'completed' && onComplete && (
+                    <TouchableOpacity
+                      style={[styles.actionButton, styles.completeActionButton]}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        onComplete(project);
+                      }}
+                    >
+                      <CheckCircle size={16} color={COLORS.white} />
+                      <Text style={[styles.actionButtonText, styles.completeActionButtonText]}>
+                        Abschließen
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+            )}
+          </View>
         </View>
-        </Card>
       </Animated.View>
     </TouchableOpacity>
   );
@@ -429,62 +406,25 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    marginBottom: 16,
-    borderRadius: 16,
+    marginBottom: 20,
+    borderRadius: 20,
     overflow: 'hidden',
     backgroundColor: COLORS.white,
     shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
+    elevation: 12,
   },
   imageContainer: {
-    position: 'relative',
-    height: 280,
+    height: 200,
     width: '100%',
+    position: 'relative',
   },
   image: {
     height: '100%',
     width: '100%',
-    borderTopLeftRadius: 1,
-    borderTopRightRadius: 1,
-  },
-  imageOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 30,
-    backgroundColor: COLORS.white,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  categoryTag: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    alignItems: 'center',
-    borderTopLeftRadius: 0,
-    borderTopRightRadius: 0,
-  },
-  categoryTagText: {
-    ...FONTS.caption,
-    color: COLORS.white,
-    fontSize: 12,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-    textAlign: 'center',
-  },
-  categoryPrefixText: {
-    fontWeight: '400' as const,
-  },
-  categoryNameText: {
-    fontWeight: '700' as const,
+    resizeMode: 'cover',
   },
   noImage: {
     backgroundColor: COLORS.gray[200],
@@ -495,214 +435,205 @@ const styles = StyleSheet.create({
     fontSize: 48,
   },
   content: {
-    padding: 12,
-    paddingTop: 0,
-    paddingBottom: 22,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 6,
+    padding: 20,
   },
   title: {
-    ...FONTS.h3,
+    fontSize: 22,
+    fontWeight: '700' as const,
     color: COLORS.text,
-    flex: 1,
-  },
-  badges: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  badge: {
-    backgroundColor: COLORS.secondary,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    marginLeft: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  completedBadge: {
-    backgroundColor: COLORS.success,
-  },
-  badgeText: {
-    color: COLORS.white,
-    fontSize: 12,
-    fontWeight: '600' as const,
-    marginLeft: 2,
-  },
-  description: {
-    ...FONTS.body2,
-    color: COLORS.textLight,
     marginBottom: 8,
+    lineHeight: 28,
   },
-  details: {
-    marginTop: 6,
-  },
-  detailsPadding: {
-    height: 4,
-  },
-  detailRow: {
+  locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexWrap: 'wrap',
+    marginBottom: 12,
   },
-  detailItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  detailItemHorizontal: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  detailText: {
-    ...FONTS.body2,
-    color: COLORS.textLight,
-    marginLeft: 8,
-  },
-  detailTextSmall: {
-    ...FONTS.caption,
+  locationText: {
+    fontSize: 14,
     color: COLORS.textLight,
     marginLeft: 6,
-    fontSize: 12,
+    fontWeight: '500' as const,
   },
-  detailSeparator: {
-    ...FONTS.caption,
+  description: {
+    fontSize: 15,
     color: COLORS.textLight,
-    marginHorizontal: 8,
-    fontSize: 12,
+    lineHeight: 22,
+    marginBottom: 20,
   },
-
-  unlockContactCard: {
+  infoGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
+  infoItem: {
+    flex: 1,
+  },
+  infoLabel: {
+    fontSize: 12,
+    color: COLORS.textLight,
+    fontWeight: '500' as const,
+    marginBottom: 6,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  categoryRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: 10,
-    padding: 6,
-    marginTop: 10,
-    borderWidth: 1,
-    borderColor: COLORS.gray[200],
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
-  customerPreview: {
+  infoValue: {
+    fontSize: 14,
+    color: COLORS.text,
+    fontWeight: '600' as const,
+    marginLeft: 6,
+  },
+  organizationSection: {
+    marginBottom: 20,
+  },
+  organizationLabel: {
+    fontSize: 12,
+    color: COLORS.textLight,
+    fontWeight: '500' as const,
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  organizationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  organizationInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
-  customerImageBlurred: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: COLORS.gray[300],
+  organizationAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 6,
-    opacity: 0.7,
+    marginRight: 12,
   },
-  customerInitial: {
-    ...FONTS.body2,
+  organizationInitial: {
+    fontSize: 16,
     color: COLORS.white,
     fontWeight: '600' as const,
   },
-  customerNameBlurred: {
-    ...FONTS.body2,
+  organizationDetails: {
+    flex: 1,
+  },
+  organizationName: {
+    fontSize: 16,
     color: COLORS.text,
+    fontWeight: '600' as const,
+    marginBottom: 2,
+  },
+  organizationStatus: {
+    fontSize: 12,
+    color: COLORS.primary,
     fontWeight: '500' as const,
   },
-  creditsCost: {
-    backgroundColor: COLORS.modernGreen,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
-    marginHorizontal: 6,
+  visitButton: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
-  creditsText: {
-    ...FONTS.caption,
+  visitButtonText: {
+    fontSize: 14,
     color: COLORS.white,
     fontWeight: '600' as const,
   },
-  unlockAction: {
+  unlockContactSection: {
+    backgroundColor: COLORS.gray[50],
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: COLORS.gray[200],
+  },
+  unlockContactContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  unlockContactLeft: {
+    flex: 1,
+  },
+  unlockContactTitle: {
+    fontSize: 16,
+    color: COLORS.text,
+    fontWeight: '600' as const,
+    marginBottom: 4,
+  },
+  unlockContactSubtitle: {
+    fontSize: 14,
+    color: COLORS.textLight,
+    fontWeight: '500' as const,
+  },
+  unlockContactButton: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
   },
-  unlockText: {
-    ...FONTS.caption,
+  unlockContactButtonText: {
+    fontSize: 14,
     color: COLORS.white,
     fontWeight: '600' as const,
-    marginRight: 4,
+    marginRight: 8,
   },
-  lockIcon: {
-    marginLeft: 2,
-  },
-  unlockedContactCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  unlockedContactSection: {
     backgroundColor: COLORS.success + '10',
-    borderRadius: 10,
-    padding: 6,
-    marginTop: 10,
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 16,
     borderWidth: 1,
     borderColor: COLORS.success + '40',
   },
-  customerImage: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 6,
-  },
-  customerName: {
-    ...FONTS.body2,
-    color: COLORS.text,
-    fontWeight: '500' as const,
-  },
-  contactInfo: {
-    marginLeft: 'auto',
-  },
-  phoneNumber: {
-    ...FONTS.body2,
+  unlockedContactTitle: {
+    fontSize: 16,
     color: COLORS.success,
     fontWeight: '600' as const,
-    textAlign: 'right',
+    marginBottom: 8,
+  },
+  unlockedContactInfo: {
+    alignItems: 'flex-start',
+  },
+  phoneNumber: {
+    fontSize: 16,
+    color: COLORS.success,
+    fontWeight: '600' as const,
   },
   emailAddress: {
-    ...FONTS.body2,
+    fontSize: 16,
     color: COLORS.primary,
     fontWeight: '600' as const,
-    textAlign: 'right',
   },
   noContactInfo: {
-    ...FONTS.body2,
+    fontSize: 14,
     color: COLORS.textLight,
     fontWeight: '500' as const,
-    textAlign: 'right',
     fontStyle: 'italic',
   },
   ownerActions: {
-    marginTop: 12,
-    padding: 12,
+    marginTop: 16,
+    padding: 16,
     backgroundColor: '#F0F9FF',
-    borderRadius: 8,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: COLORS.primary + '20',
   },
   ownerActionsTitle: {
-    ...FONTS.body2,
+    fontSize: 16,
     fontWeight: '600' as const,
     color: COLORS.primary,
-    marginBottom: 8,
+    marginBottom: 12,
   },
   actionButtons: {
     flexDirection: 'row',
@@ -712,9 +643,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.white,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: COLORS.primary,
     flex: 1,
@@ -726,10 +657,10 @@ const styles = StyleSheet.create({
     borderColor: COLORS.success,
   },
   actionButtonText: {
-    ...FONTS.caption,
+    fontSize: 14,
     color: COLORS.primary,
     fontWeight: '600' as const,
-    marginLeft: 4,
+    marginLeft: 6,
   },
   completeActionButtonText: {
     color: COLORS.white,
